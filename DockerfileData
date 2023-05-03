@@ -1,0 +1,60 @@
+WORKDIR ..
+
+COPY mysqlrootopt user.sql grants.sql .
+CMD mysql start
+RUN mysql --defaults-extra-file=mysqlrootopt < user.sql
+RUN mysql --defaults-extra-file=mysqlrootopt < grants.sql
+
+ARG cfg=/opt/cfg
+COPY mail.cfg host.cfg host.cfg mql.cfg mqlimportopt mysqldumpopt ${cfg}/
+COPY \
+        shebanq_etcbc4.mql.bz2 \
+        shebanq_passage4.sql.gz \
+        shebanq_etcbc4b.mql.bz2 \
+        shebanq_passage4b.sql.gz \
+        shebanq_etcbc2017.mql.bz2 \
+        shebanq_passage2017.sql.gz \
+        shebanq_etcbc2021.mql.bz2 \
+        shebanq_passage2021.sql.gz \
+        filldb.sh .
+
+RUN mysql --defaults-extra-file={cfg}/mysqldumpopt -uroot < {cfg}/user.sql
+RUN mysql --defaults-extra-file={cfg}/mysqldumpopt -uroot < {cfg}/grants.sql
+
+RUN \
+        bunzip2 -f shebanq_etcbc4.mql.bz2 && \
+        bunzip2 -f shebanq_etcbc4b.mql.bz2 && \
+        bunzip2 -f shebanq_etcbc2017.mql.bz2 && \
+        bunzip2 -f shebanq_etcbc2021.mql.bz2 && \
+
+RUN \
+        gunzip -f shebanq_passage4.sql.gz && \
+        gunzip -f shebanq_passage4b.sql.gz && \
+        gunzip -f shebanq_passage2017.sql.gz && \
+        gunzip -f shebanq_passage2021.sql.gz
+
+ARG ihost=host.docker.internal
+ARG edir=/opt/emdros
+
+# RUN \
+#     mysql --defaults-extra-file={cfg}/mysqldumpopt -h{ihost} -e "drop database if exists shebanq_etcbc4;" && \
+#     mysql --defaults-extra-file={cfg}/mysqldumpopt -h{ihost} -e "drop database if exists shebanq_etcbc4b;" && \
+#     mysql --defaults-extra-file={cfg}/mysqldumpopt -h{ihost} -e "drop database if exists shebanq_etcbc2017;" && \
+#     mysql --defaults-extra-file={cfg}/mysqldumpopt -h{ihost} -e "drop database if exists shebanq_etcbc2021;" && \
+
+# RUN \
+#     mysql --defaults-extra-file={cfg}/mysqldumpopt -h{ihost} -e "drop database if exists shebanq_passage4;" && \
+#     mysql --defaults-extra-file={cfg}/mysqldumpopt -h{ihost} -e "drop database if exists shebanq_passage4b;" && \
+#     mysql --defaults-extra-file={cfg}/mysqldumpopt -h{ihost} -e "drop database if exists shebanq_passage2017;" && \
+#     mysql --defaults-extra-file={cfg}/mysqldumpopt -h{ihost} -e "drop database if exists shebanq_passage2021;" && \
+
+RUN {edir}/bin/mql -e UTF8 -n -b m -h ${ihost} -u shebanq_admin -p uvw456 < shebanq_etcbc4.mql
+RUN {edir}/bin/mql -e UTF8 -n -b m -h ${ihost} -u shebanq_admin -p uvw456 < shebanq_etcbc4b.mql
+RUN {edir}/bin/mql -e UTF8 -n -b m -h ${ihost} -u shebanq_admin -p uvw456 < shebanq_etcbc2017.mql
+RUN {edir}/bin/mql -e UTF8 -n -b m -h ${ihost} -u shebanq_admin -p uvw456 < shebanq_etcbc2021.mql
+
+RUN mysql --defaults-extra-file={cfg}/mysqldumpopt -h{ihost} < shebanq_passage4.sql
+RUN mysql --defaults-extra-file={cfg}/mysqldumpopt -h{ihost} < shebanq_passage4b.sql
+RUN mysql --defaults-extra-file={cfg}/mysqldumpopt -h{ihost} < shebanq_passage2017.sql
+RUN mysql --defaults-extra-file={cfg}/mysqldumpopt -h{ihost} < shebanq_passage2021.sql
+
