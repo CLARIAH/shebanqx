@@ -10,7 +10,6 @@ RUN apt-get update \
         libapache2-mod-wsgi-py3 \
         libmysqlclient-dev \
         mysql-client \
-        mysql-server \
     && \
     pip3 install markdown \
     && \
@@ -40,5 +39,3 @@ RUN ./configure \
     --disable-debug && \
     make && \
     make install
-
-ENTRYPOINT bash
