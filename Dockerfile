@@ -21,7 +21,7 @@ ARG emdrosdir="/opt/emdros"
 
 WORKDIR build
 
-COPY emdros-${emdrosversion}.tar.gz .
+COPY /src/software/emdros-${emdrosversion}.tar.gz .
 RUN tar xf emdros-${emdrosversion}.tar.gz
 
 WORKDIR emdros-${emdrosversion}
