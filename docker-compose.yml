@@ -5,12 +5,14 @@ volumes:
     driver: local
 
 services:
-  shebanqapp:
-    image: registry.diginfra.net/vicd/shebanqapp:${dockertag}
+  shebanq:
+    # image: registry.diginfra.net/dirkr/shebanq:${dockertag}
+    build: .
     # restart: unless-stopped
-    container_name: shebanqapp
-    hostname: shebanqapp
+    container_name: shebanq
+    hostname: shebanq
     environment:
+      maintenance: ${maintenance}
       gitlocation: ${gitlocation}
       hostname: ${hostname}
       mysqlrootpwd: ${mysqlrootpwd}
@@ -25,15 +27,19 @@ services:
       - "${shebanqport}:${shebanqport}"
 
   db:
-    image: mysql:8.0
+    image: mariadb:10
+    container_name: shebanqdb
+    hostname: shebanqdb
     cap_add:
       - SYS_NICE
     restart: always
     environment:
       - MYSQL_DATABASE=quotes
       - MYSQL_ROOT_PASSWORD=${mysqlrootpwd}
+      - MYSQL_USER=${mysqluser}
+      - MYSQL_PASSWORD=${mysqluserpwd}
     ports:
       - '3306:3306'
     volumes:
       - db:/var/lib/mysql
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./mysql:/etc/mysql/conf.d

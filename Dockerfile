@@ -18,9 +18,10 @@ RUN apt-get update \
 ARG emdrosversion="3.7.3"
 ARG emdrosdir="/opt/emdros"
 
-WORKDIR build
+WORKDIR /app
 
-COPY /src/software/emdros-${emdrosversion}.tar.gz .
+COPY emdros .
+
 RUN tar xf emdros-${emdrosversion}.tar.gz
 
 WORKDIR emdros-${emdrosversion}
@@ -39,3 +40,14 @@ RUN ./configure \
     --disable-debug && \
     make && \
     make install
+
+WORKDIR /app
+
+# DEPLOY WEB2PY
+
+# DEPLOY SHEBANQ
+
+# RUN APACHE IN THE FOREGROUND
+
+# INITIALIZE READONLY/DYNAMIC DATABASES
+# do this manually from within a running container
