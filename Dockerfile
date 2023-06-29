@@ -10,6 +10,7 @@ RUN apt-get update \
         libapache2-mod-wsgi-py3 \
         libmysqlclient-dev \
         mysql-client \
+        unzip \
     && \
     pip3 install markdown \
     && \
@@ -41,7 +42,7 @@ RUN ./configure \
     make && \
     make install
 
-WORKDIR /app
+WORKDIR /app/maintenance
 
 # DEPLOY WEB2PY
 

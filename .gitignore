@@ -76,6 +76,11 @@ _temp/
 #####################
 data/
 
+# Running app
+###########################
+shebanq/
+web2py/
+
 # Experiments
 _experiments/
 exp_*

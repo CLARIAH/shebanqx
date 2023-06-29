@@ -11,16 +11,18 @@ Run it from the /src directory in the repo.
 "
 
 
-# python web2py.py --no_gui -s localhost -p 8000 -a shebanq -c local.crt -k local.key
-
-if [[ "${maintenance}" == "v" ]]; then
+if [[ "${runmode}" == "maintenance" ]]; then
     echo "MAINTENANCE MODE"
     tail -f /dev/null &
     pid=$!
-else
-    echo "SERVING MODE"
-    cd /web2py
-    python web2py.py --no_gui -s localhost -p 8000 -a shebanq &
+elif [[ "${runmode}" == "prod" ]]; then
+    echo "PRODUCTION MODE"
+    apachectl -D FOREGROUND &
+    pid=$!
+elif [[ "${runmode}" == "dev" ]]; then
+    echo "DEVELOP MODE"
+    cd /app/web2py
+    python web2py.py --no_gui -i 0.0.0.0 -p 8000 -a shebanq
     pid=$!
 fi
 

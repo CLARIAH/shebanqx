@@ -6,7 +6,7 @@ from gluon.tools import Auth, Crud, Service, PluginManager
 from gluon.contrib.login_methods.rpx_account import use_janrain
 
 
-request.requires_https()
+# request.requires_https()
 
 shebanqUser = CONFIG["shebanqUser"]
 shebanqPassword = CONFIG["shebanqPassword"]
@@ -104,7 +104,7 @@ for vr in VERSION_ORDER:
 session.connect(request, response, db=db)
 response.generic_patterns = ["*"] if request.is_local else []
 
-auth = Auth(db, secure=True)  # secure=True should enforce https for auth
+auth = Auth(db, secure=False)  # secure=True should enforce https for auth
 current.auth = auth
 
 crud, service, plugins = Crud(db), Service(), PluginManager()

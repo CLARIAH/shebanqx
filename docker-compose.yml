@@ -1,7 +1,7 @@
 version: '3.7'
 
 volumes:
-  db:
+  data:
     driver: local
 
 services:
@@ -12,13 +12,14 @@ services:
     container_name: shebanq
     hostname: shebanq
     environment:
-      maintenance: ${maintenance}
+      runmode: ${runmode}
       gitlocation: ${gitlocation}
       hostname: ${hostname}
+      mysqlhost: ${mysqlhost}
       mysqlrootpwd: ${mysqlrootpwd}
       mysqluser: ${mysqluser}
       mysqluserpwd: ${mysqluserpwd}
-    entrypoint: ["./start.sh"]
+    entrypoint: ["/app/start.sh"]
     depends_on:
       - db
     volumes:
@@ -41,5 +42,5 @@ services:
     ports:
       - '3306:3306'
     volumes:
-      - db:/var/lib/mysql
+      - data:/var/lib/mysql
       - ./mysql:/etc/mysql/conf.d

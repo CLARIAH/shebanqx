@@ -93,23 +93,6 @@
     <script src="{{=URL('static','js/markdown.min.js')}}"></script>
     <noscript><link href="{{=URL('static', 'css/web2py_bootstrap_nojs.css')}}" rel="stylesheet" type="text/css" /></noscript>
 
-    <script type="text/javascript">
-    // <![CDATA[
-     var _paq = _paq || [];
-     _paq.push(['trackPageView']);
-     _paq.push(['enableLinkTracking']);
-     (function() {
-       var u="//stats.dans.knaw.nl/";
-       _paq.push(['setTrackerUrl', u+'danstats.php']);
-       _paq.push(['setSiteId', '6']);
-       var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-       g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'danstats.js'; s.parentNode.insertBefore(g,s);
-     } )();
-    // ]]>
-    </script>
-    <noscript><p><img src="https://stats.dans.knaw.nl/danstats.php?idsite=6" style="border:0;" alt="" /></p></noscript>
-
-
     {{block head}}{{end}}
     </head>
 
@@ -184,7 +167,7 @@
     <!-- Footer ================================================== -->
     <div class="row-fluid">
         <footer class="footer span12" id="footer">
-            <div class="footer-content"  style="bottom: -5px;" id="footer">
+            <div class="footer-content"  style="bottom: -5px;" id="footerinner">
                 {{block footer}} <!-- this is default footer -->
                 <div class="pull-left">
                     <a target="_blank" title="VU ETCBC"
@@ -226,14 +209,5 @@
       <script src="{{=URL('static','js/dd_belatedpng.js')}}"></script>
       <script> DD_belatedPNG.fix('img, .png_bg'); //fix any <img> or .png_bg background-images </script>
       <![endif]-->
-
-    {{if response.google_analytics_id:}}
-    <script src="{{=URL('static','js/analytics.min.js')}}"></script>
-    <script type="text/javascript">
-    analytics.initialize({
-    'Google Analytics':{trackingId:'{{=response.google_analytics_id}}'} 
-    });</script>
-    {{pass}}
     </body>
 </html>
-
