@@ -15,17 +15,21 @@ services:
       runmode: ${runmode}
       gitlocation: ${gitlocation}
       hostname: ${hostname}
+      hostport: ${hostport}
+      web2pyadminpwd: ${web2pyadminpwd}
       mysqlhost: ${mysqlhost}
       mysqlrootpwd: ${mysqlrootpwd}
       mysqluser: ${mysqluser}
       mysqluserpwd: ${mysqluserpwd}
-    entrypoint: ["/app/start.sh"]
+    entrypoint: 
+      - /bin/bash
+      - /app/start.sh
     depends_on:
       - db
     volumes:
-      - "./:/app"
+      - ./:/app
     ports:
-      - "${shebanqport}:${shebanqport}"
+      - "${hostport}:${hostport}"
 
   db:
     image: mariadb:10
@@ -43,4 +47,4 @@ services:
       - '3306:3306'
     volumes:
       - data:/var/lib/mysql
-      - ./mysql:/etc/mysql/conf.d
+      - ./src/mysql:/etc/mysql/conf.d

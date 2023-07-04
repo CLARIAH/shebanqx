@@ -15,7 +15,9 @@ class QUERYCHAPTER:
         VERSIONS = current.VERSIONS
 
         for vr in (
-            ("2017", "2021") if current.SITUATION in {"local", "test"} else VERSIONS
+            ("2017", "2021")
+            if current.SITUATION in {"maintenance", "develop", "other"}
+            else VERSIONS
         ):
             self.makeQCindex(vr)
 

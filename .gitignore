@@ -78,8 +78,10 @@ data/
 
 # Running app
 ###########################
-shebanq/
-web2py/
+run/
+
+# Secrets
+secret/
 
 # Experiments
 _experiments/

@@ -21,7 +21,7 @@ ARG emdrosdir="/opt/emdros"
 
 WORKDIR /app
 
-COPY emdros .
+COPY src/emdros .
 
 RUN tar xf emdros-${emdrosversion}.tar.gz
 
@@ -42,13 +42,4 @@ RUN ./configure \
     make && \
     make install
 
-WORKDIR /app/maintenance
-
-# DEPLOY WEB2PY
-
-# DEPLOY SHEBANQ
-
-# RUN APACHE IN THE FOREGROUND
-
-# INITIALIZE READONLY/DYNAMIC DATABASES
-# do this manually from within a running container
+WORKDIR /app

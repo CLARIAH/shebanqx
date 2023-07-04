@@ -18,21 +18,21 @@ Also details about the mailserver and account that can send
 shebanq emails to users for the purpose of password verification.
 """
 
-configPath = "/opt/cfg/mql.cfg"
+configPath = "/app/run/cfg/mql.cfg"
 if os.path.exists(configPath):
     with open(configPath) as p:
         CONFIG["shebanqPassword"] = p.read().rstrip("\n")
 else:
     CONFIG["shebanqPassword"] = "localpwd"
 
-configPath = "/opt/cfg/host.cfg"
+configPath = "/app/run/cfg/host.cfg"
 if os.path.exists(configPath):
     with open(configPath) as p:
         CONFIG["shebanqHost"] = p.read().rstrip("\n")
 else:
     CONFIG["shebanqHost"] = "localhost"
 
-configPath = "/opt/cfg/mail.cfg"
+configPath = "/app/run/cfg/mail.cfg"
 if os.path.exists(configPath):
     with open(configPath) as p:
         keyValueLines = p.read().split("\n")

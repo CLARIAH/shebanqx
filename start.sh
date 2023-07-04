@@ -15,14 +15,23 @@ if [[ "${runmode}" == "maintenance" ]]; then
     echo "MAINTENANCE MODE"
     tail -f /dev/null &
     pid=$!
-elif [[ "${runmode}" == "prod" ]]; then
+elif [[ "${runmode}" == "production" || "${runmode}" == "" ]]; then
+    runmode=production
     echo "PRODUCTION MODE"
+    echo "waiting for shebanqdb to come online"
+    sleep 2
+    ./install.sh
+    echo RUNNING apache ...
     apachectl -D FOREGROUND &
     pid=$!
-elif [[ "${runmode}" == "dev" ]]; then
+elif [[ "${runmode}" == "develop" ]]; then
     echo "DEVELOP MODE"
-    cd /app/web2py
-    python web2py.py --no_gui -i 0.0.0.0 -p 8000 -a shebanq
+    echo "waiting for shebanqdb to come online"
+    sleep 2
+    ./install.sh
+    echo RUNNING web2py dev server ...
+    cd /app/run/web2py
+    python3 web2py.py --no_gui -i 0.0.0.0 -p $hostport -a $web2pyadminpwd &
     pid=$!
 fi
 
