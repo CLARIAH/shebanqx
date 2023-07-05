@@ -16,13 +16,13 @@ RUN apt-get update \
     && \
     ln -s /usr/bin/python3 /usr/bin/python
 
+# Compile and install EMDROS software
+
 ARG emdrosversion="3.7.3"
 ARG emdrosdir="/opt/emdros"
 
 WORKDIR /app
-
 COPY src/emdros .
-
 RUN tar xf emdros-${emdrosversion}.tar.gz
 
 WORKDIR emdros-${emdrosversion}
@@ -41,5 +41,16 @@ RUN ./configure \
     --disable-debug && \
     make && \
     make install
+
+# Configure Apache
+
+WORKDIR /etc/apache2
+COPY src/apache/wsgi.conf mods-available 
+COPY src/apache/shebanq.conf sites-available 
+RUN ln -sf ../mods-available/expires.load mods-enabled \
+    && \
+    ln -sf ../mods-available/headers.load mods-enabled \
+    && \
+    ln -sf ../sites-available/shebanq.conf sites-enabled/shebanq.conf
 
 WORKDIR /app
