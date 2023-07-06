@@ -29,12 +29,12 @@ The evolution of SHEBANQ till now can be seen in
 which reflects the history of SHEBANQ since October 2017.
 It still contains the documentation and lots of useful information.
 
-**begin not yet in effect, upcoming**
+**upcoming ---**
 
 Medio summer 2023 SHEBANQ migrated to KNAW/HuC in the context of CLARIAH,
 which acts as the successor of CLARIN.
 
-**end not yet in effect, upcoming**
+**--- upcoming**
 
 ## Deployment
 
@@ -52,14 +52,14 @@ docker compose up -d
 
 See [USAGE](USAGE.md) for the ins and outs of this deployment.
 
-**begin not yet in effect, upcoming**
+**upcoming ---**
 
 SHEBANQ as seen on
 [shebanq.ancient-data.org](https://shebanq.ancient-data.org)
 is deployed by
 [KNAW/HuC](https://di.huc.knaw.nl/infrastructure-services-en.html).
 
-**end not yet in effect, upcoming**
+**--- upcoming**
 
 # Author
 
