@@ -21,6 +21,7 @@ services:
       mysqlrootpwd: ${mysqlrootpwd}
       mysqluser: ${mysqluser}
       mysqluserpwd: ${mysqluserpwd}
+      blankuserdata: ${blankuserdata}
     entrypoint: 
       - /bin/bash
       - /app/start.sh

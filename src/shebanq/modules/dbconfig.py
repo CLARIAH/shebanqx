@@ -11,12 +11,19 @@ EMDROS_VERSIONS = [
 Copied manually from /opt/emdros/include/emdros/version-emdros.h
 """
 
-CONFIG = dict(shebanqUser="shebanq")
+CONFIG = dict()
 """Connection details for the databases.
 
 Also details about the mailserver and account that can send
 shebanq emails to users for the purpose of password verification.
 """
+
+configPath = "/app/run/cfg/muser.cfg"
+if os.path.exists(configPath):
+    with open(configPath) as p:
+        CONFIG["shebanqUser"] = p.read().rstrip("\n")
+else:
+    CONFIG["shebanqUser"] = "shebanq"
 
 configPath = "/app/run/cfg/mql.cfg"
 if os.path.exists(configPath):

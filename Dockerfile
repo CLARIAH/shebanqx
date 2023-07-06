@@ -53,4 +53,6 @@ RUN ln -sf ../mods-available/expires.load mods-enabled \
     && \
     ln -sf ../sites-available/shebanq.conf sites-enabled/shebanq.conf
 
+# Configure DB access
+
 WORKDIR /app

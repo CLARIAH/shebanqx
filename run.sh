@@ -1,17 +1,10 @@
 #!/bin/bash
 
 HELP="
-
-Runs shebanq in various parts and modes.
-
-You can trigger individual steps with tasks.
-
-
-USAGE
-
-Run it in the top-level directory
-
-./command.sh task
+Invoked by start.sh as entry point of the shebanq container.
+Or manually invoked within a running container.
+Executes tests or service tasks.
+Working directory: any.
 
 TASKS
 
@@ -26,30 +19,35 @@ production
     This is the default.
 "
 
-test=x
-production=v
-develop=x
+if [[ $1 == "--help" || $1 == "-h" ]]; then
+    printf $HELP
+    exit
+fi
+
+testshebanq=x
+runmode=production
 
 while [ ! -z $1 ]; do
-    if [[ $1 == test ]]; then
-        test=v
+    if [[ $1 == test-shebanq ]]; then
+        testshebanq=v
+        runmode=x
         shift
     elif [[ $1 == production ]]; then
-        production=v
+        testshebanq=x
+        runmode=production
         shift
     elif [[ $1 == develop ]]; then
-        develop=v
+        testshebanq=x
+        runmode=develop
         shift
     else
         echo "unrecognized argument '$1'"
+        testshebanq=x
+        runmode=x
         good=x
-        shift
+        exit
     fi
 done
-
-if [[ $good == x ]]; then
-    exit
-fi
 
 # directories in the repo (persistently mounted into the shebanq image)
 
@@ -59,18 +57,18 @@ rundir=$appdir/run
 web2pydir=$rundir/web2py
 
 
-if [[ $test == v ]]; then
+if [[ $testshebanq == v ]]; then
     cd $web2pydir
     python3 web2py.py -S shebanq/hebrew/text -M > /dev/null
     exit
 fi
 
-if [[ $production == v ]]; then
+if [[ $runmode == production ]]; then
     echo "PRODUCTION MODE (Apache)"
     apachectl -D FOREGROUND
 fi
 
-if [[ $develop == v ]]; then
+if [[ $runmode == develop ]]; then
     echo "DEVELOP MODE (web2py dev server)"
     cd $web2pydir
     python3 web2py.py --no_gui -i 0.0.0.0 -p $hostport -a $web2pyadminpwd

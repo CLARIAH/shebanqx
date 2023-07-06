@@ -1,62 +1,54 @@
 #!/bin/bash
 
 HELP="
-
-Installs the SHEBANQ app and its prerequisite Web2Py.
-It will add directories cfg, mysql, shebanq, web2py under the run directory.
-
-The operation is idempotent: it detects what is already present, and fills in the blanks.
-
-USAGE
-
-Run it in the top-level directory
-
-./install.sh
+Invoked by start.sh as entry point of the shebanq container.
+Or manually invoked within a running container.
+Installs and configures software.
+No arguments needed.
+Working directory: any.
 "
 
-#----------------------------------------------------------------------------------
-# Settings
-#----------------------------------------------------------------------------------
-
-# directories in the repo (persistently mounted into the shebanq image)
+if [[ $1 == "--help" || $1 == "-h" ]]; then
+    printf $HELP
+    exit
+fi
 
 appdir=/app
 srcdir=$appdir/src
+cfgdir=$rundir/cfg
 rundir=$appdir/run
 
-cfgdir=$rundir/cfg
-mysqloptfile=$cfgdir/mysql.opt
-
 web2pydir=$rundir/web2py
+mysqloptfile=$cfgdir/mysql.opt
 
 shebanqdir=$rundir/shebanq
 shebanqappdir=$web2pydir/applications/shebanq
 
 #----------------------------------------------------------------------------------
-# Config files
+# Config files (always, env var may have changed)
 #----------------------------------------------------------------------------------
 
 if [[ ! -d $cfgdir ]]; then
-    mysqlhost=shebanqdb
-
     mkdir -p $cfgdir
+fi
 
-    echo "
+echo "
 [mysql]
 password = '$mysqlrootpwd'
 user = root
 host = $mysqlhost
     " > $mysqloptfile
 
-    echo "$mysqluserpwd" > $cfgdir/mql.cfg
-    echo $mysqlhost > $cfgdir/host.cfg
-    echo -e "server = localhost\nsender = shebanq@ancient-data.org" > $cfgdir/mail.cfg
+echo "$mysqluser" > $cfgdir/muser.cfg
+echo "$mysqluserpwd" > $cfgdir/mql.cfg
+echo $mysqlhost > $cfgdir/host.cfg
+echo $web2pyadminpwd > $cfgdir/web2py.cfg
+echo -e "server = localhost\nsender = shebanq@ancient-data.org" > $cfgdir/mail.cfg
 
-    echo "config files created" 
-fi
+echo "config files created" 
 
 #----------------------------------------------------------------------------------
-# Install Web2Py
+# Web2Py
 #----------------------------------------------------------------------------------
 
 if [[ ! -e $web2pydir ]]; then
@@ -72,37 +64,34 @@ if [[ ! -e $web2pydir ]]; then
         mv web2py* web2py
     fi
 
-    # patch web2py
-    # so that the admin app can run over http
-    # see https://github.com/smithmicro/web2py/blob/17a3afce0c368b5ab83ea941b81934851eddaafb/entrypoint.sh#L38
-    #
+    # patch web2py to allow admin over http
+
     pfile=$adminappdir/models/access.py
     sed -i "s/elif not request.is_local and not DEMO_MODE:/elif False:/" $pfile
 
     pfile=$web2pydir/gluon/main.py
     sed -i "s/is_local=(env.remote_addr in local_hosts and client == env.remote_addr)/is_local=True/" $pfile
 
-    # to inhibit a syntax warning
-    #
+    # patch web2py to inhibit a syntax warning
+     
     pfile=$adminappdir/views/default/change_password.html
     sed -i "s/if fieldname is not/if fieldname !=/" $pfile
 
-    cd $web2pydir
-    python3 -c "from gluon.main import save_password; save_password('''$web2pyadminpwd''', $hostport)"
-    cd $appdir
+    # put custom files in place
 
     cp $srcdir/routes.py $web2pydir
     cp $srcdir/wsgihandler.py $web2pydir
  
-    if [[ -e $shebanqdir ]]; then
-        # hookup shebanq in web2py/applications
+    # hook up shebanq in web2py/applications
 
+    if [[ -e $shebanqdir ]]; then
         if [[ ! -e $shebanqappdir ]]; then
             ln -sf ../../shebanq $shebanqappdir
         fi
     fi
 
-    # remove examples and welcome applications
+    # remove the examples application
+    # (if we remove the welcome application, web2py will complain)
 
     for app in examples
     do
@@ -118,6 +107,7 @@ if [[ ! -e $web2pydir ]]; then
     done
 
     # make certain dirs of admin app writable
+
     for wd in log cache errors sessions private uploads
     do
         wdpath=$adminappdir/$wd
@@ -132,21 +122,29 @@ if [[ ! -e $web2pydir ]]; then
     generatedDir=$adminappdir/compiled
     if [[ ! -e $generatedDir ]]; then
         mkdir $generatedDir
-        chown www-data:www-data $generatedDir
+        # chown www-data:www-data $generatedDir
     fi
     cmd1="import gluon.compileapp;"
     cmd2="gluon.compileapp.compile_application('applications/admin')"
+
+    # python-compile modules of admin app
 
     cd $web2pydir
     python3 -c "$cmd1 $cmd2" > /dev/null
     cd $adminappdir
     python3 -m compileall modules > /dev/null
     generatedDir=$adminappdir/modules/__pycache__
-    chown -R www-data:www-data $generatedDir
+    # chown -R www-data:www-data $generatedDir
     cd $appdir
 
     echo "web2py installed"
 fi
+
+# set the admin password (always, env var may have changed)
+
+cd $web2pydir
+python3 -c "from gluon.main import save_password; save_password('''$web2pyadminpwd''', $hostport)"
+cd $appdir
 
 #----------------------------------------------------------------------------------
 # Install SHEBANQ
@@ -161,6 +159,8 @@ if [[ ! -d $shebanqdir ]]; then
 fi
 
 shebanqsrcdir=$srcdir/shebanq
+
+# copy over the missing subdirectories
 
 for subdir in $shebanqsrcdir/*
 do
@@ -197,7 +197,7 @@ if [[ $compileneeded == v ]]; then
     generatedDir=$shebanqdir/compiled
     if [[ ! -e $generatedDir ]]; then
         mkdir $generatedDir
-        chown -R www-data:www-data $generatedDir
+        # chown -R www-data:www-data $generatedDir
     fi
     cmd1="import gluon.compileapp;"
     cmd2="gluon.compileapp.compile_application('applications/shebanq')"
@@ -207,7 +207,7 @@ if [[ $compileneeded == v ]]; then
     cd $shebanqappdir
     python3 -m compileall modules > /dev/null
     generatedDir=$shebanqdir/modules/__pycache__
-    chown -R www-data:www-data $generatedDir
+    # chown -R www-data:www-data $generatedDir
     changed=v
 fi
 

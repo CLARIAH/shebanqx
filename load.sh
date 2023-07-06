@@ -1,31 +1,19 @@
 #!/bin/bash
 
 HELP="
-
-Loads the SHEBANQ databases.
-
-It will load static data containing the texts and linguistic annotaitons.
-And it will load the dynamic data contributed by users: queries and notes and admin details.
-
-The operation is idempotent: it detects what is already present, and fills in the blanks.
-
-USAGE
-
-Run it in the top-level directory
-
-./load.sh
-
+Invoked by start.sh as entry point of the shebanq container.
+Or manually invoked within a running container.
+Loads data.
+No arguments needed.
+Working directory: any.
 "
 
-#----------------------------------------------------------------------------------
-# Settings
-#----------------------------------------------------------------------------------
-
-# locations on the image (persistent)
+if [[ $1 == "--help" || $1 == "-h" ]]; then
+    printf $HELP
+    exit
+fi
 
 mqlcmd=/opt/emdros/bin/mql
-
-# directories in the repo (persistently mounted into the shebanq image)
 
 appdir=/app
 srcdir=$appdir/src
@@ -52,10 +40,6 @@ fi
 echo Database grants have been set
 
 
-#----------------------------------------------------------------------------------
-# Load databases
-#----------------------------------------------------------------------------------
-
 # test which of the needed databases are already in mysql
 # after this we have for each existing database a variable with name dbexists_databasename
 
@@ -66,16 +50,7 @@ do
     fi
 done
 
-# import the missing databases
-
-# here come the readonly databases. For each version of the Hebrew Bible
-# there are two databases:
-#  shebanq_passageVERSION: ordinary sql data,
-#   contains the text of the verses,
-#   optimized for displaying the bible text
-#  shebanq_etcbcVERSION: mql data,
-#   contains the text plus linguistic annotations by the ETCBC,
-#   optimized for executing MQL queries
+# import the missing static databases
 
 for version in 4 4b c 2017 2021
 do
@@ -84,16 +59,16 @@ do
 
     if [[ ${!dbvar} != v ]]; then
         echo Importing $db
-        datafile=$db.sql
-        datafilez=$datafile.gz
+        dbfile=$db.sql
+        dbfilez=$dbfile.gz
 
-        if [[ ! -e $tmpdir/$datafile ]]; then
+        if [[ ! -e $tmpdir/$dbfile ]]; then
             echo -e "\tunzipping $db (takes approx.  5 seconds)"
-            cp $dbdir/$datafilez $tmpdir
-            gunzip -f $tmpdir/$datafilez
+            cp $dbdir/$dbfilez $tmpdir
+            gunzip -f $tmpdir/$dbfilez
         fi
         echo -e "\tloading $db (takes approx. 15 seconds)"
-        mysql $mysqlasroot < $tmpdir/$datafile
+        mysql $mysqlasroot < $tmpdir/$dbfile
         echo -e "\tdone"
     fi
 
@@ -102,74 +77,58 @@ do
 
     if [[ ${!dbvar} != v ]]; then
         echo Importing $db
-        datafile=$db.mql
-        datafilez=$datafile.bz2
+        dbfile=$db.mql
+        dbfilez=$dbfile.bz2
 
-        if [[ ! -e $tmpdir/$datafile ]]; then
+        if [[ ! -e $tmpdir/$dbfile ]]; then
             echo -e "\tunzipping $db (takes approx. 75 seconds)"
-            cp $dbdir/$datafilez $tmpdir
-            bunzip2 -f $tmpdir/$datafilez
+            cp $dbdir/$dbfilez $tmpdir
+            bunzip2 -f $tmpdir/$dbfilez
         fi
         mysql $mysqlasroot -e "drop database if exists $db;"
         echo -e "\tloading emdros $db (takes approx. 50 seconds)"
-        $mqlcmd -e UTF8 -n -b m $mysqlasroote < $tmpdir/$datafile
+        $mqlcmd -e UTF8 -n -b m $mysqlasroote < $tmpdir/$dbfile
         echo -e "\tdone"
     fi
 done
 
-# here come the dynamic databases. They contain the user-contributed content
-# there are two databases:
-#  shebanq_web: user details, saved queries
-#  shebanq_note: saved notes
-#
-# the shebanq_note has foreign-key dependencies on shebanq_web.
-#  When deleting these databases: first delete shebanq_note, then shebanq_web.
-#  When importing these databases: first import shebanq_web, then shebanq_note.
-#
-# When you want to import pre-existing data, they should have been exported as
-# SQL exports.
-# Put them in the secret/data_in folder, you may gzip them, but this is not necessary.
-# The secret folder is not synched with GitHub.
-# Also, remove existing databases with this name from _temp.
-#
-# If you do not have pre-existing data, empty databases will be supplied, but with the
-# right model inside. These empty exports are also in this repo, and they are synched
-# with GitHub.
-
-    # Cleanup stage (only if the import of dynamic data is forced)
-    # The order note - web is important.
+# import the missing static databases
 
 good=v
+
+# Cleanup stage (only if the import of dynamic data is forced)
+# The order note - web is important.
+
 
 for kind in note web
 do
     db=shebanq_$kind
     dbvar=dbexists_$db
 
-    if [[ ${!dbvar} != v ]]; then
+    if [[ ${!dbvar} != v || $blankuserdata == v ]]; then
         echo Checking $db
-        datafile=$db.sql
-        datafilez=$datafile.gz
+        dbfile=$db.sql
+        dbfile_emp=${db}_empty.sql
+        dbfilez=$dbfile.gz
 
-        if [[ -e $tmpdir/$datafile ]]; then
+        if [[ $blankuserdata != v && -e $tmpdir/$dbfile ]]; then
             echo previous db content from temp directory
         else
-            if [[ -e $secretdir/$datafilez ]]; then
+            if [[ $blankuserdata != "v" && -e $secretdir/$dbfilez ]]; then
                 echo previous db content from secret directory
-                cp $secretdir/$datafilez $tmpdir/$datafilez
+                cp $secretdir/$dbfilez $tmpdir/$dbfilez
                 echo o-o-o - unzipping $db
-                gunzip -f $tmpdir/$datafilez
-            elif [[ -e $srcdir/$datafilez ]]; then
-                echo no previous content
-                cp $srcdir/$datafilez $tmpdir/$datafilez
-                gunzip -f $datafilezl
+                gunzip -f $tmpdir/$dbfilez
+            elif [[ -e $dbdir/$dbfile_emp ]]; then
+                echo "working with empty db"
+                cp $dbdir/$dbfile_emp $tmpdir/$dbfile
             else
                 echo no data
                 good=x
             fi
         fi
         if [[ $good == x ]]; then
-            exit
+            continue
         fi
 
         mysql $mysqlasroot -e "drop database if exists $db;"
@@ -184,12 +143,14 @@ for kind in web note
 do
     db=shebanq_$kind
     dbvar=dbexists_$db
-    if [[ ${!dbvar} != v ]]; then
-        datafile=$db.sql
+    if [[ $blankuserdata == v || ${!dbvar} != v ]]; then
+        dbfile=$db.sql
 
-        if [[ -e $tmpdir/$datafile ]]; then
-            echo "use $db" | cat - $tmpdir/$datafile | mysql $mysqlasroot
+        if [[ -e $tmpdir/$dbfile ]]; then
+            echo "use $db" | cat - $tmpdir/$dbfile | mysql $mysqlasroot
+            echo Imported $db
+        else
+            echo "Data file $dbfile does not exist in $tmpdir"
         fi
-        echo Imported $db
     fi
 done
