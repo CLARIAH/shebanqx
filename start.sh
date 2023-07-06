@@ -22,7 +22,6 @@ if [[ $runmode == maintenance ]]; then
 
 else
 
-    $appdir/cfg.sh
     $appdir/install.sh
 
     echo waiting for shebanqdb to come online

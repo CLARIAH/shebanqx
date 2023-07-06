@@ -117,10 +117,10 @@ do
             if [[ $blankuserdata != "v" && -e $secretdir/$dbfilez ]]; then
                 echo previous db content from secret directory
                 cp $secretdir/$dbfilez $tmpdir/$dbfilez
-                echo o-o-o - unzipping $db
+                echo unzipping $db
                 gunzip -f $tmpdir/$dbfilez
             elif [[ -e $dbdir/$dbfile_emp ]]; then
-                echo "working with empty db"
+                echo working with empty db
                 cp $dbdir/$dbfile_emp $tmpdir/$dbfile
             else
                 echo no data

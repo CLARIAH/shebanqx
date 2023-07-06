@@ -1,0 +1,12 @@
+gitlocation=https://github.com/CLARIAH/shebanqx.git
+gitbranch=master
+dockertag=0.1
+hostname=localhost
+hostport=8000
+web2pyadminpwd=silly_admin
+mysqlhost=shebanqdb
+mysqluser=shebanq
+mysqluserpwd=silly_mysql_pwd
+mysqlrootpwd=sillier_mysql_pwd
+runmode=develop
+blankuserdata=v

@@ -1,5 +1,0 @@
-
-## ::: ftests.test_words
-
----
-
