@@ -39,7 +39,6 @@ _docker/*
 # Logs and databases #
 ######################
 *.log
-*.sql
 *.sqlite
 
 # OS generated files #
@@ -79,9 +78,6 @@ data/
 # Running app
 ###########################
 run/
-
-# Secrets
-secret/
 
 # Experiments
 _experiments/
