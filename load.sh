@@ -65,7 +65,7 @@ do
         echo -e "\tdone"
     fi
 
-    echo "GRANT SELECT ON $db.* TO '$mysqluser'@'%'; FLUSH PRIVILEGES;" | mysql $mysqlasroot
+    echo "GRANT SELECT ON $db.* TO '$mysqluser'@'$mysqluserhost'" | mysql $mysqlasroot
 
 
     db=shebanq_etcbc$version
@@ -87,7 +87,7 @@ do
         echo -e "\tdone"
     fi
 
-    echo "GRANT SELECT ON $db.* TO '$mysqluser'@'%'; FLUSH PRIVILEGES;" | mysql $mysqlasroot
+    echo "GRANT SELECT ON $db.* TO '$mysqluser'@'$mysqluserhost'" | mysql $mysqlasroot
 done
 
 # import the missing dynamic databases
@@ -152,5 +152,5 @@ do
         fi
     fi
 
-    echo "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTERt ON $db.* TO '$mysqluser'@'%'; FLUSH PRIVILEGES;" | mysql $mysqlasroot
+    echo "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER ON $db.* TO '$mysqluser'@'%'; FLUSH PRIVILEGES;" | mysql $mysqlasroot
 done
