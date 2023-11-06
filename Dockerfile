@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
@@ -9,8 +9,9 @@ RUN apt-get update \
         libexpat1 apache2 apache2-utils ssl-cert \
         libapache2-mod-wsgi-py3 \
         libmysqlclient-dev \
-        mysql-client \
+        mariadb-client \
         unzip \
+        bzip2 \
     && \
     pip3 install markdown \
     && \

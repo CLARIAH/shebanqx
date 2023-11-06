@@ -9,14 +9,14 @@ Working directory: any.
 "
 
 if [[ $1 == "--help" || $1 == "-h" ]]; then
-    printf $HELP
+    printf "$HELP"
     exit
 fi
 
 appdir=/app
 srcdir=$appdir/src
-cfgdir=$rundir/cfg
 rundir=$appdir/run
+cfgdir=$rundir/cfg
 
 web2pydir=$rundir/web2py
 mysqloptfile=$cfgdir/mysql.opt
@@ -35,7 +35,7 @@ fi
 echo "
 [mysql]
 password = '$mysqlrootpwd'
-user = root
+user = $mysqlroot
 host = $mysqlhost
     " > $mysqloptfile
 

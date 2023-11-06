@@ -18,6 +18,7 @@ services:
       hostport: ${hostport}
       web2pyadminpwd: ${web2pyadminpwd}
       mysqlhost: ${mysqlhost}
+      mysqlroot: ${mysqlroot}
       mysqlrootpwd: ${mysqlrootpwd}
       mysqluser: ${mysqluser}
       mysqluserpwd: ${mysqluserpwd}

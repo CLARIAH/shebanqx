@@ -9,7 +9,7 @@ Working directory: any.
 "
 
 if [[ $1 == "--help" || $1 == "-h" ]]; then
-    printf $HELP
+    printf "$HELP"
     exit
 fi
 
@@ -24,24 +24,17 @@ tmpdir=$appdir/_temp
 cfgdir=$rundir/cfg
 mysqloptfile=$cfgdir/mysql.opt
 mysqlasroot=--defaults-extra-file=$mysqloptfile
-mysqlasroote="-h $mysqlhost -u root -p $mysqlrootpwd"
+mysqlasroote="-h $mysqlhost -u $mysqlroot -p $mysqlrootpwd"
 
 
 dbdir=$srcdir/databases
 
 # set the permissions for the shebanq database user
 
-mysql $mysqlasroot < $srcdir/grants.sql > /dev/null
-if [[ $? -ne 0 ]]; then
-    echo Cannot connect to database
-    exit
-fi
-
-echo Database grants have been set
-
-
 # test which of the needed databases are already in mysql
 # after this we have for each existing database a variable with name dbexists_databasename
+
+mkdir -p $tmpdir
 
 for db in `echo "show databases;" | mysql $mysqlasroot`
 do
@@ -72,6 +65,9 @@ do
         echo -e "\tdone"
     fi
 
+    echo "GRANT SELECT ON $db.* TO '$mysqluser'@'%'; FLUSH PRIVILEGES;" | mysql $mysqlasroot
+
+
     db=shebanq_etcbc$version
     dbvar=dbexists_$db
 
@@ -90,9 +86,11 @@ do
         $mqlcmd -e UTF8 -n -b m $mysqlasroote < $tmpdir/$dbfile
         echo -e "\tdone"
     fi
+
+    echo "GRANT SELECT ON $db.* TO '$mysqluser'@'%'; FLUSH PRIVILEGES;" | mysql $mysqlasroot
 done
 
-# import the missing static databases
+# import the missing dynamic databases
 
 good=v
 
@@ -153,4 +151,6 @@ do
             echo "Data file $dbfile does not exist in $tmpdir"
         fi
     fi
+
+    echo "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTERt ON $db.* TO '$mysqluser'@'%'; FLUSH PRIVILEGES;" | mysql $mysqlasroot
 done

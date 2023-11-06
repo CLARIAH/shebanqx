@@ -172,8 +172,7 @@ Loads the SHEBANQ databases, in as far as they are missing.
 It will always perform the setting of the correct grants for the user `shebanq`
 in the database. This is the user on whose behalf the shebanq web-app connects
 to the database system.
-In this step, the current grants are revoked, and precisely the right grants
-are (re)instated.
+Precisely the right grants are instated.
 
 After this it will load:
 

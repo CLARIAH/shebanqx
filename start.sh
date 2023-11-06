@@ -8,7 +8,7 @@ Working directory: any.
 "
 
 if [[ $1 == "--help" || $1 == "-h" ]]; then
-    printf $HELP
+    printf "$HELP"
     exit
 fi
 
