@@ -22,12 +22,16 @@ if [[ $runmode == maintenance ]]; then
 
 else
 
+    echo verifying whether installation is complete
     $appdir/install.sh
+    echo installation is complete
 
     echo waiting for shebanqdb to come online
     sleep 2
     $appdir/load.sh
+    echo all data present in shebanqdb
 
+    echo starting shebanq web app
     $appdir/run.sh $runmode &
     pid=$!
 fi

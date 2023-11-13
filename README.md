@@ -31,7 +31,7 @@ It still contains the documentation and lots of useful information.
 
 **upcoming ---**
 
-Medio summer 2023 SHEBANQ migrated to KNAW/HuC in the context of CLARIAH,
+As of 2024-01-01 SHEBANQ migrated to KNAW/HuC in the context of CLARIAH,
 which acts as the successor of CLARIN.
 
 **--- upcoming**

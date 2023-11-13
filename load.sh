@@ -36,6 +36,8 @@ dbdir=$srcdir/databases
 
 mkdir -p $tmpdir
 
+echo check existence of databases
+
 for db in `echo "show databases;" | mysql $mysqlasroot`
 do
     if [[ $db =~ ^shebanq_ ]]; then
@@ -43,7 +45,7 @@ do
     fi
 done
 
-# import the missing static databases
+echo import the missing static databases
 
 for version in 4 4b c 2017 2021
 do
@@ -65,7 +67,7 @@ do
         echo -e "\tdone"
     fi
 
-    echo "GRANT SELECT ON $db.* TO '$mysqluser'@'$mysqluserhost'" | mysql $mysqlasroot
+    # echo "GRANT SELECT ON $db.* TO '$mysqluser'@'$mysqluserhost'" | mysql $mysqlasroot
 
 
     db=shebanq_etcbc$version
@@ -87,10 +89,10 @@ do
         echo -e "\tdone"
     fi
 
-    echo "GRANT SELECT ON $db.* TO '$mysqluser'@'$mysqluserhost'" | mysql $mysqlasroot
+    # echo "GRANT SELECT ON $db.* TO '$mysqluser'@'$mysqluserhost';" | mysql $mysqlasroot
 done
 
-# import the missing dynamic databases
+echo cleanup the dynamic databases
 
 good=v
 
@@ -137,6 +139,8 @@ done
 # Import stage.
 # The order web - note is important.
 
+echo import the dynamic databases
+
 for kind in web note
 do
     db=shebanq_$kind
@@ -145,12 +149,12 @@ do
         dbfile=$db.sql
 
         if [[ -e $tmpdir/$dbfile ]]; then
-            echo "use $db" | cat - $tmpdir/$dbfile | mysql $mysqlasroot
+            echo "use $db;\n" | cat - $tmpdir/$dbfile | mysql $mysqlasroot
             echo Imported $db
         else
             echo "Data file $dbfile does not exist in $tmpdir"
         fi
     fi
 
-    echo "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER ON $db.* TO '$mysqluser'@'%'; FLUSH PRIVILEGES;" | mysql $mysqlasroot
+    echo "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER ON $db.* TO '$mysqluser'@'$mysqluserhost';" | mysql $mysqlasroot
 done

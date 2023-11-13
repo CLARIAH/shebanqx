@@ -105,8 +105,8 @@
             </ResourceLicense>
             <Contact>
                <person>Dirk Roorda</person>
-               <email>dirk.roorda@dans.knaw.nl</email>
-               <organisation xml:lang="eng">Data Archiving and Networked Services (DANS)</organisation>
+               <email>dirk.roorda@huc.di.knaw.nl</email>
+               <organisation xml:lang="eng">KNAW/Humanities Cluster</organisation>
             </Contact>
          </Access>
          <ResourceDocumentation>
@@ -126,7 +126,7 @@
                <funder>CLARIN-NL</funder>
                <url>http://portal.clarin.nl/node/4180</url>
                <Contact>
-                  <email>dirk.roorda@dans.knaw.nl</email>
+                  <email>dirk.roorda@huc.di.knaw.nl</email>
                </Contact>
                <Duration/>
             </Project>
