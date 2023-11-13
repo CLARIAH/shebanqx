@@ -165,11 +165,8 @@ shebanqsrcdir=$srcdir/shebanq
 for subdir in $shebanqsrcdir/*
 do
     subname=`basename $subdir`
-    subdest=$shebanqdir/$subname
-    if [[ ! -d $subdest ]]; then
-        cp -R $subdir $subdest
-        compileneeded=v
-    fi
+    rsync -av --delete --exclude '__pycache__' $subdir $shebanqdir/
+    compileneeded=v
 done
 
 # make certain dirs in the shebanq app writable
@@ -197,7 +194,7 @@ if [[ $compileneeded == v ]]; then
     generatedDir=$shebanqdir/compiled
     if [[ ! -e $generatedDir ]]; then
         mkdir $generatedDir
-        # chown -R www-data:www-data $generatedDir
+        chown -R www-data:www-data $generatedDir
     fi
     cmd1="import gluon.compileapp;"
     cmd2="gluon.compileapp.compile_application('applications/shebanq')"
@@ -207,7 +204,7 @@ if [[ $compileneeded == v ]]; then
     cd $shebanqappdir
     python3 -m compileall modules > /dev/null
     generatedDir=$shebanqdir/modules/__pycache__
-    # chown -R www-data:www-data $generatedDir
+    chown -R www-data:www-data $generatedDir
     changed=v
 fi
 

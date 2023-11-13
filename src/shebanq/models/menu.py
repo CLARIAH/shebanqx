@@ -32,7 +32,13 @@ onDev = runMode == "develop"
 onOther = not (inMaintenance or onProd or onDev)
 
 current.SITUATION = (
-    "production" if onProd else "develop" if onDev else "maintenance" if inMaintenance else "other"
+    "production"
+    if onProd
+    else "develop"
+    if onDev
+    else "maintenance"
+    if inMaintenance
+    else "other"
 )
 current.DEBUG = onDev or inMaintenance
 

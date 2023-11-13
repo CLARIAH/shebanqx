@@ -13,8 +13,6 @@ RUN apt-get update \
         unzip \
         bzip2 \
     && \
-    pip3 install markdown \
-    && \
     ln -s /usr/bin/python3 /usr/bin/python
 
 # Compile and install EMDROS software
@@ -54,6 +52,16 @@ RUN ln -sf ../mods-available/expires.load mods-enabled \
     && \
     ln -sf ../sites-available/shebanq.conf sites-enabled/shebanq.conf
 
-# Configure DB access
+# Install additional software
+
+RUN apt-get update \
+    && \
+    apt-get install -y \
+        unzip \
+        bzip2 \
+        rsync \
+    && \
+    pip3 install markdown
+
 
 WORKDIR /app
