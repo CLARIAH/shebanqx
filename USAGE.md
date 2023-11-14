@@ -10,17 +10,17 @@ In an interactive shell you can run the scripts to install, load and run.
 There are two serving modes
 
 * `production` (apache);
-* `develop` (web2py devserver).
+* `develop` (Web2py development server).
 
 Note that the source container is mounted in at `/app`.
 
 We run several scripts:
 
 1.  `install.sh` : installs missing bits on `/app/run`;
-1.  `load.sh` : Loads missing databases in the shebanqdb container;
+1.  `load.sh` : Loads missing databases in the `shebanqdb` container;
 1.  `run.sh` : starts the serving process in the background.
 
-We catch the pid of the serving process and wait for it to be interrupted by Ctrl+C,
+We catch the PID of the serving process and wait for it to be interrupted by Ctrl+C,
 on which the process will get terminated.
 This approach will prevent docker compose to wait 10 seconds
 before killing the process.
@@ -37,22 +37,22 @@ Between restarts of the container the values of these variables may have changed
 So, whenever we start a container, we make sure that these files are written out,
 first thing.
 
-Note that also the value of the web2py admin password is written to disk, not
+Note that also the value of the Web2py admin password is written to disk, not
 in this step, but in `install.sh` below. That also will be done every time, after
-web2py is installed. 
+Web2py is installed. 
 
 The `shebanq` image contains the following installed software:
 
-1.  **emdros**
+1.  **EMDROS**
     (database extension software)
 
     Offers the `mql` command in `/opt/emdros/bin/mql`.
 
-1.  **apache**
+1.  **APACHE**
     (web server)
 
     Offers the `apachectl` command. 
-    The webserver is configured for *wsgi* and has the configuration for the
+    The web server is configured for WSGI and has the configuration for the
     shebanq website in place.
 
 However, the software of SHEBANQ is not yet in place.
@@ -63,7 +63,7 @@ We need to set up Web2py and Shebanq in this step.
 When the shebanq container starts up, it verifies whether Web2py and Shebanq
 are installed, and if not, it will install what is missing.
 It can install Web2py and Shebanq independently. It takes care that in all cases
-Shebanq will be hooked neatly inside Wep2py.
+Shebanq will be hooked neatly inside Web2py.
 
 However, we will not install Web2py and Shebanq inside the container,
 but in the source volume, under the `run` directory, so in `/app/run`.
@@ -73,7 +73,7 @@ but in the source volume, under the `run` directory, so in `/app/run`.
 **Q**: Why did not we install it before starting the container then?
 
 **A**: Well, some of the installation steps involve running code in the container:
-we run several functions of Web2Py, using the Python that runs in the ocntainer.
+we run several functions of Web2py, using the Python that runs in the container.
 These steps involve compiling Python code to bytecode, and if we did that
 from the outside, the risk is that the bytecode generated in this way is not
 compatible with the Python that runs inside the container.
@@ -110,25 +110,25 @@ Then we do the following steps:
     See
     [here](https://github.com/smithmicro/web2py/blob/17a3afce0c368b5ab83ea941b81934851eddaafb/entrypoint.sh#L38).
 
-1.  We configure Web2py over htpp only, a proxy will take care of https.
-    So web2py only sees http requests, and would never allow the admin interface.
+1.  We configure Web2py over `htpp` only, a proxy will take care of https.
+    So Web2py only sees HTTP requests, and would never allow the admin interface.
 
-1.  We set a password for the admin interface, by calling a method of web2py.
-    This will generate a file `parameters_ppp.py` in the web2py directory, which is
-    a hash of that password, and needed by web2py to authenticate admins.
+1.  We set a password for the admin interface, by calling a method of Web2py.
+    This will generate a file `parameters_ppp.py` in the `web2py` directory, which is
+    a hash of that password, and needed by Web2py to authenticate admins.
 
     **This step will be done every time,
-    regardless whether web2py was installed or not.**
+    regardless whether Web2py was installed or not.**
 
 1.  If shebanq is already present, it will be linked to from the `application`
     directory.
 
 1.  We put some custom files in place and remove some unneeded material.
 
-1.  We make sure that several writable dirs are present within the admin app of
-    web2py. We give `www-data` ownership of these files.
+1.  We make sure that several writable directories are present within the admin app of
+    Web2py. We give `www-data` ownership of these files.
 
-1.  We compile the admin app, by using a web2py command to make a web-app readily
+1.  We compile the admin app, by using a Web2py command to make a web-app readily
     available.
 
 1.  We python-compile the python code in the modules of the admin app.
@@ -146,20 +146,20 @@ there.
 **Q**: Why not copy the complete directory at once?
 
 **A**: Shebanq will gather other materials in the course of its operation:
-errors, logs, uploads, etc and they arrive in its writable direcotries.
+errors, logs, uploads, etc and they arrive in its writable directories.
 We do not want to loose that information when we restart the container.
 
 ---
 
 Then we do the following steps:
 
-1.  We make sure that several writable dirs are present within the shebanq app.
+1.  We make sure that several writable directories are present within the shebanq app.
     We give `www-data` ownership of these files.
 
-1.  If web2py is already present, we create a soft link from its `application`
+1.  If `web2py` is already present, we create a soft link from its `application`
     directory to shebanq.
 
-1.  We compile the shebanq app, by using a web2py command to make a web-app readily
+1.  We compile the shebanq app, by using a Web2py command to make a web-app readily
     available.
 
 1.  We python-compile the python code in the modules of the shebanq app.
@@ -190,10 +190,10 @@ The Hebrew data comes in several versions, from old to new:
 For each *version* there are two databases:
 
 *   `shebanq_passage`*version* :
-    ordinary sql data, contains the text of the verses,
+    ordinary SQL data, contains the text of the verses,
     optimized for displaying the bible text;
 *   `shebanq_etcbc`*version* :
-    *mql* data,
+    *MQL* data,
     contains the text plus linguistic annotations by the ETCBC,
     optimized for executing MQL queries.
 
@@ -237,7 +237,7 @@ Runs shebanq in various parts and modes, triggered by the first command line
 argument:
 
 *   `production`: starts Apache;
-*   `develop`: starts the web2py dev server;
+*   `develop`: starts the Web2py development server;
 *   `test-shebanq`: tests the main controller of SHEBANQ.
 
 This script is called by `start.sh` with arguments `production` or `develop`,

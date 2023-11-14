@@ -15,8 +15,8 @@ The static data is delivered via the [BHSA]({{bhsa}}) repository,
 where it arrived through a [pipeline]({{pipeline}})) from
 the source data as it sits on ETCBC servers.
 
-The specialty of SHEBANQ is that it offers users the facility to
-run queries against the data and to store those queries so theat they
+The speciality of SHEBANQ is that it offers users the facility to
+run queries against the data and to store those queries so that they
 can be shared and published.
 
 The query engine for this is [Emdros]({{emdros}}) which sits on top

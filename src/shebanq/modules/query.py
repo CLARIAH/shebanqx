@@ -317,14 +317,15 @@ class QUERY:
         po=False,
     ):
         """
-        If called with singleVersion is True,
-        we are grabbibg queries for the side list of a chapter.
+        If called with `singleVersion=True`,
+        we are grabbing queries for the side list of a chapter.
         In this case:
-        *   query_id is an iterable of query ids
-        *   we only want the query exe records of these queries for a single version vr
-        *   we only want query records that are:
+        *   `query_id` is an iterable of query identifiers
+        *   we only want the query exe records of these queries for a single
+            version `vr`
+        *   we only want query records that:
             *   belong to a shared query
-            *   up to date: executed after modified
+            *   are up to date: executed after modified
         """
         db = current.db
 
