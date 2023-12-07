@@ -17,6 +17,7 @@ appdir=/app
 srcdir=$appdir/src
 rundir=$appdir/run
 cfgdir=$rundir/cfg
+logdir=$rundir/log
 
 web2pydir=$rundir/web2py
 mysqloptfile=$cfgdir/mysql.opt
@@ -43,9 +44,19 @@ echo "$mysqluser" > $cfgdir/muser.cfg
 echo "$mysqluserpwd" > $cfgdir/mql.cfg
 echo $mysqlhost > $cfgdir/host.cfg
 echo $web2pyadminpwd > $cfgdir/web2py.cfg
-echo -e "server = localhost\nsender = shebanq@ancient-data.org" > $cfgdir/mail.cfg
+echo -e "server = mail0.diginfra.net\nsender = dirk.roorda@di.huc.knaw.nl" > $cfgdir/mail.cfg
 
 echo "config files created" 
+
+#----------------------------------------------------------------------------------
+# Log dir (always make sure the log dir exists and is writable by Apache)
+#----------------------------------------------------------------------------------
+
+if [[ ! -e $logdir ]]; then
+    mkdir $logdir
+fi
+
+chown www-data:www-data $logdir
 
 #----------------------------------------------------------------------------------
 # Web2Py

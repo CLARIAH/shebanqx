@@ -5,7 +5,7 @@ RUN apt-get update \
     && \
     apt-get install -y \
         build-essential \
-        python3 python3-dev python3-pip \
+        python3.10 libpython3.10-dev python3-pip \
         libexpat1 apache2 apache2-utils ssl-cert \
         libapache2-mod-wsgi-py3 \
         libmysqlclient-dev \
@@ -57,8 +57,6 @@ RUN ln -sf ../mods-available/expires.load mods-enabled \
 RUN apt-get update \
     && \
     apt-get install -y \
-        unzip \
-        bzip2 \
         rsync \
     && \
     pip3 install markdown
