@@ -44,7 +44,8 @@ echo "$mysqluser" > $cfgdir/muser.cfg
 echo "$mysqluserpwd" > $cfgdir/mql.cfg
 echo $mysqlhost > $cfgdir/host.cfg
 echo $web2pyadminpwd > $cfgdir/web2py.cfg
-echo -e "server = mail0.diginfra.net\nsender = dirk.roorda@di.huc.knaw.nl" > $cfgdir/mail.cfg
+# echo -e "server = mail0.diginfra.net\nsender = dirk.roorda@di.huc.knaw.nl" > $cfgdir/mail.cfg
+echo -e "server = mail0.diginfra.net\nsender = shebanq@ancient-data.org" > $cfgdir/mail.cfg
 
 echo "config files created" 
 
