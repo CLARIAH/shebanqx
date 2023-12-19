@@ -24,6 +24,7 @@ mysqloptfile=$cfgdir/mysql.opt
 
 shebanqdir=$rundir/shebanq
 shebanqappdir=$web2pydir/applications/shebanq
+adminappdir=$web2pydir/applications/admin
 
 #----------------------------------------------------------------------------------
 # Config files (always, env var may have changed)
@@ -76,18 +77,40 @@ if [[ ! -e $web2pydir ]]; then
         mv web2py* web2py
     fi
 
-    # patch web2py to allow admin over http
+    # Various pathces of web2py
+    #
+    # See https://groups.google.com/g/web2py/c/633ZkgcK2AM
+    # and
+    # https://github.com/web2py/web2py/issues/2173
 
-    pfile=$adminappdir/models/access.py
-    sed -i "s/elif not request.is_local and not DEMO_MODE:/elif False:/" $pfile
+    # patch web2py to allow admin over http
 
     pfile=$web2pydir/gluon/main.py
     sed -i "s/is_local=(env.remote_addr in local_hosts and client == env.remote_addr)/is_local=True/" $pfile
+
+    pfile=$adminappdir/models/access.py
+    sed -i "s/elif not request.is_local and not DEMO_MODE:/elif False:/" $pfile
 
     # patch web2py to inhibit a syntax warning
      
     pfile=$adminappdir/views/default/change_password.html
     sed -i "s/if fieldname is not/if fieldname !=/" $pfile
+
+    # patch web2py to prevent T() within HTTP()
+    # We just remove the T() from around a string argument.
+
+    pfile=$adminappdir/controllers/appadmin.py
+    sed -i "s/HTTP(200, T('appadmin is disabled because insecure channel'))/HTTP(200, 'appadmin is disabled because insecure channel')/" $pfile
+
+    pfile=$adminappdir/controllers/default.py
+    sed -i 's/HTTP(500, T("Invalid request"))/HTTP(500, "Invalid request")/g' $pfile
+
+    pfile=$adminappdir/models/access.py
+    sed -i "s/HTTP(200, T('Admin is disabled because insecure channel'))/HTTP(200, 'Admin is disabled because insecure channel')/" $pfile
+    sed -i "s/HTTP(200, T('admin disabled because no admin password'))/HTTP(200, 'admin disabled because no admin password')/" $pfile
+
+    pfile=$web2pydir/applications/welcome/controllers/appadmin.py
+    sed -i "s/HTTP(200, T('appadmin is disabled because insecure channel'))/HTTP(200, 'appadmin is disabled because insecure channel')/" $pfile
 
     # put custom files in place
 
@@ -156,13 +179,14 @@ fi
 
 cd $web2pydir
 python3 -c "from gluon.main import save_password; save_password('''$web2pyadminpwd''', $hostport)"
+python3 -c "from gluon.main import save_password; save_password('''$web2pyadminpwd''', 443)"
 cd $appdir
 
 #----------------------------------------------------------------------------------
 # Install SHEBANQ
 #----------------------------------------------------------------------------------
 
-compileneeded=x
+compileneeded=v
 changed=x
 
 if [[ ! -d $shebanqdir ]]; then
@@ -183,14 +207,17 @@ done
 
 # make certain dirs in the shebanq app writable
 
-for wd in log cache errors sessions private uploads
+for wd in log cache errors sessions private uploads databases
 do
-    subdest=$shebanqdir/$wd
-    if [[ ! -d $subdest ]]; then
-        mkdir $subdest
-        chown www-data:www-data $subdest
-        changed=v
-    fi
+    for basedir in $shebanqdir $adminappdir
+    do
+        subdest=$basedir/$wd
+        if [[ ! -d $subdest ]]; then
+            mkdir $subdest
+            chown www-data:www-data $subdest
+            changed=v
+        fi
+    done
 done
 
 # Configure Web2Py and SHEBANQ
@@ -203,6 +230,7 @@ fi
 # compile shebanq app
 
 if [[ $compileneeded == v ]]; then
+    echo "compiling app ..."
     generatedDir=$shebanqdir/compiled
     if [[ ! -e $generatedDir ]]; then
         mkdir $generatedDir
@@ -210,12 +238,24 @@ if [[ $compileneeded == v ]]; then
     fi
     cmd1="import gluon.compileapp;"
     cmd2="gluon.compileapp.compile_application('applications/shebanq')"
+    cmd3="gluon.compileapp.compile_application('applications/admin')"
 
     cd $web2pydir
     python3 -c "$cmd1 $cmd2" > /dev/null
+    python3 -c "$cmd1 $cmd3" > /dev/null
+
     cd $shebanqappdir
     python3 -m compileall modules > /dev/null
     generatedDir=$shebanqdir/modules/__pycache__
+    python3 -m compileall models > /dev/null
+    generatedDir=$shebanqdir/models/__pycache__
+    chown -R www-data:www-data $generatedDir
+
+    cd $adminappdir
+    python3 -m compileall modules > /dev/null
+    generatedDir=$adminappdir/modules/__pycache__
+    python3 -m compileall models > /dev/null
+    generatedDir=$adminappdir/models/__pycache__
     chown -R www-data:www-data $generatedDir
     changed=v
 fi

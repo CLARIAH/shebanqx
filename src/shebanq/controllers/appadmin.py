@@ -44,7 +44,7 @@ elif (
     and (remote_addr != "127.0.0.1")
     and (request.function != "manage")
 ):
-    raise HTTP(200, T("appadmin is disabled because insecure channel"))
+    raise HTTP(200, "appadmin is disabled because insecure channel")
 
 if request.function == "manage":
     if "auth" not in globals() or not request.args:

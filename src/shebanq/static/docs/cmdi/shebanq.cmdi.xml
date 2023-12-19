@@ -105,7 +105,7 @@
             </ResourceLicense>
             <Contact>
                <person>Dirk Roorda</person>
-               <email>dirk.roorda@huc.di.knaw.nl</email>
+               <email>dirk.roorda@di.huc.knaw.nl</email>
                <organisation xml:lang="eng">KNAW/Humanities Cluster</organisation>
             </Contact>
          </Access>
@@ -126,7 +126,7 @@
                <funder>CLARIN-NL</funder>
                <url>http://portal.clarin.nl/node/4180</url>
                <Contact>
-                  <email>dirk.roorda@huc.di.knaw.nl</email>
+                  <email>dirk.roorda@di.huc.knaw.nl</email>
                </Contact>
                <Duration/>
             </Project>
