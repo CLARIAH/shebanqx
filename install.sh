@@ -187,6 +187,7 @@ fi
 cd $web2pydir
 python3 -c "from gluon.main import save_password; save_password('''$web2pyadminpwd''', $hostport)"
 python3 -c "from gluon.main import save_password; save_password('''$web2pyadminpwd''', 443)"
+python3 -c "from gluon.main import save_password; save_password('''$web2pyadminpwd''', 80)"
 cd $appdir
 
 #----------------------------------------------------------------------------------
