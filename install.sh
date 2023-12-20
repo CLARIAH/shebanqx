@@ -77,7 +77,7 @@ if [[ ! -e $web2pydir ]]; then
         mv web2py* web2py
     fi
 
-    # Various pathces of web2py
+    # Various patches of web2py
     #
     # See https://groups.google.com/g/web2py/c/633ZkgcK2AM
     # and
@@ -87,30 +87,37 @@ if [[ ! -e $web2pydir ]]; then
 
     pfile=$web2pydir/gluon/main.py
     sed -i "s/is_local=(env.remote_addr in local_hosts and client == env.remote_addr)/is_local=True/" $pfile
+    echo "patched $pfile"
 
     pfile=$adminappdir/models/access.py
     sed -i "s/elif not request.is_local and not DEMO_MODE:/elif False:/" $pfile
+    echo "patched $pfile"
 
     # patch web2py to inhibit a syntax warning
      
     pfile=$adminappdir/views/default/change_password.html
     sed -i "s/if fieldname is not/if fieldname !=/" $pfile
+    echo "patched $pfile"
 
     # patch web2py to prevent T() within HTTP()
     # We just remove the T() from around a string argument.
 
     pfile=$adminappdir/controllers/appadmin.py
     sed -i "s/HTTP(200, T('appadmin is disabled because insecure channel'))/HTTP(200, 'appadmin is disabled because insecure channel')/" $pfile
+    echo "patched $pfile"
 
     pfile=$adminappdir/controllers/default.py
     sed -i 's/HTTP(500, T("Invalid request"))/HTTP(500, "Invalid request")/g' $pfile
+    echo "patched $pfile"
 
     pfile=$adminappdir/models/access.py
     sed -i "s/HTTP(200, T('Admin is disabled because insecure channel'))/HTTP(200, 'Admin is disabled because insecure channel')/" $pfile
     sed -i "s/HTTP(200, T('admin disabled because no admin password'))/HTTP(200, 'admin disabled because no admin password')/" $pfile
+    echo "patched $pfile"
 
     pfile=$web2pydir/applications/welcome/controllers/appadmin.py
     sed -i "s/HTTP(200, T('appadmin is disabled because insecure channel'))/HTTP(200, 'appadmin is disabled because insecure channel')/" $pfile
+    echo "patched $pfile"
 
     # put custom files in place
 

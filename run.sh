@@ -25,7 +25,6 @@ if [[ $1 == "--help" || $1 == "-h" ]]; then
 fi
 
 testshebanq=x
-runmode=production
 
 while [ ! -z $1 ]; do
     if [[ $1 == test-shebanq ]]; then
