@@ -105,16 +105,16 @@ do
     db=shebanq_$kind
     dbvar=dbexists_$db
 
-    if [[ ${!dbvar} != v || $blankuserdata == v ]]; then
+    if [[ ${!dbvar} != v || $blankuserdata == v || $newuserdata == v ]]; then
         echo Checking $db
         dbfile=$db.sql
         dbfile_emp=${db}_empty.sql
         dbfilez=$dbfile.gz
 
-        if [[ $blankuserdata != v && -e $tmpdir/$dbfile ]]; then
+        if [[ $blankuserdata != v && $newuserdata != v && -e $tmpdir/$dbfile ]]; then
             echo previous db content from temp directory
         else
-            if [[ $blankuserdata != "v" && -e $secretdir/$dbfilez ]]; then
+            if [[ ( $blankuserdata != v || $newuserdata == v ) && -e $secretdir/$dbfilez ]]; then
                 echo previous db content from secret directory
                 cp $secretdir/$dbfilez $tmpdir/$dbfilez
                 echo unzipping $db
@@ -145,7 +145,7 @@ for kind in web note
 do
     db=shebanq_$kind
     dbvar=dbexists_$db
-    if [[ $blankuserdata == v || ${!dbvar} != v ]]; then
+    if [[ $blankuserdata == v || $newuserdata == v || ${!dbvar} != v ]]; then
         dbfile=$db.sql
 
         if [[ -e $tmpdir/$dbfile ]]; then
